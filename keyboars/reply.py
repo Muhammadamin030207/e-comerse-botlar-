@@ -9,12 +9,4 @@ def contact_keyboard():
         one_time_keyboard=True
     )
 
-def confirm_keyboard():
-    return ReplyKeyboardMarkup(
-        keyboard=[
-            [KeyboardButton(text="Tasdiqlash")],
-            [KeyboardButton(text="Tahrirlash")]
-        ],
-        resize_keyboard=True,
-        one_time_keyboard=True
-    )
+

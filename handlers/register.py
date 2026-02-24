@@ -1,10 +1,16 @@
-from aiogram import Router
-from aiogram.types import Message
+from email import message
+from aiogram.types import Message,CallbackQuery
+from aiogram import Bot,F,Router
+from config import config
 from aiogram.fsm.context import FSMContext
-
 from states.register import RegisterState
-from keyboars.reply import contact_keyboard, confirm_keyboard
+from keyboars.inline import  confirm_inline_keyboard
+from keyboars.reply import contact_keyboard 
+from databases.database import Database
 
+db= Database()
+bot = Bot(token=config.BOT_TOKEN)
+ADMIN_ID=7602386575
 router = Router()
 
 @router.message(RegisterState.full_name)
@@ -51,26 +57,31 @@ async def get_phone(message: Message, state: FSMContext):
         f"Telefon: {data['phone']}"
     )
 
-    await message.answer(text, reply_markup=confirm_keyboard())
-    await state.set_state(RegisterState.confirm)
+    await message.answer(text, reply_markup=confirm_inline_keyboard())
+    await state.set_state(RegisterState.confim)
 
-@router.message(RegisterState.confirm)
-async def confirm_handler(message: Message, state: FSMContext):
+@router.callback_query(RegisterState.confim, F.data)
+async def confirm_handler(call: CallbackQuery, state: FSMContext,db):
     data = await state.get_data()
 
-    if message.text == "Tasdiqlash":
-        await message.answer(
-            "Siz muvaffaqiyatli ro'yxatdan o'tdingiz!\n\n"
-            f"Ism: {data['full_name']}\n"
-            f"Yosh: {data['age']}\n"
-            f"Gmail: {data['email']}\n"
-            f"Telefon: {data['phone']}"
-        , reply_markup=None)
-        await state.clear()
-        
+    if call.data == "confirm":
+        data = await state.get_data()
+        await bot.send_message(chat_id=ADMIN_ID,text=(f"""Yangi foydalanuvchi ro'yxatdan o'tdi:
+        Ism: {data['full_name']}
+        Yosh: {data['age']}
+        Gmail: {data['email']}
+        Telefon: {data['phone']}"""))
 
-    elif message.text == "Tahrirlash":
-        await message.answer("Qayta kiriting.\nIsm familiyangizni yozing:")
+        user_id = call.from_user.id
+        full_name = data['full_name']
+        age = data['age']
+        email = data['email']
+        contact = data['phone']
+        await db.add_user(user_id, full_name, age, email, contact)
+        await call.message.answer("Ro'yxatdan o'tish muvaffaqiyatli yakunlandi! Endi siz bizning botimizdan foydalanishingiz mumkin.")
+
+    elif call.data == "edit":
+        await call.message.answer("Qayta kiriting.\nIsm familiyangizni yozing:")
         await state.set_state(RegisterState.full_name)
 
     else:

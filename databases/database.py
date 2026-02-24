@@ -1,0 +1,64 @@
+import asyncpg
+from config import config
+
+
+class Database:
+    def __init__(self):
+        self.pool = None
+
+    async def connect(self):
+        self.pool = await asyncpg.create_pool(
+            database=config.DB_NAME,
+            user=config.DB_USER,
+            password=config.DB_PASSWORD,
+            host=config.DB_HOST,
+            port=config.DB_PORT
+        )
+
+    async def check_user(self, user_id):
+        query = "SELECT * FROM users2 WHERE user_id = $1"
+        return await self.pool.fetchrow(query, user_id)
+
+    async def user_profile(self, user_id):
+        query = "SELECT full_name, age, email, contact FROM users2 WHERE user_id = $1"
+        return await self.pool.fetchrow(query, user_id)
+
+
+
+    async def add_user(self, user_id, full_name, age, email, contact):
+        query = """
+        INSERT INTO users2 (user_id, full_name, age, email, contact)
+        VALUES ($1, $2, $3, $4, $5)
+        ON CONFLICT (user_id) DO NOTHING;
+        """
+        await self.pool.execute(query, user_id, full_name, int(age), email, contact)
+
+    async def get_user_role(self, user_id):
+        query = """
+        SELECT role FROM users2 WHERE user_id = $1;
+        """
+        return await self.pool.fetchval(query, user_id)
+
+    async def get_users(self):
+        query = """
+        SELECT full_name, role,user_id FROM users2 order by id;
+        """
+        return await self.pool.fetch(query)
+    
+    async def set_user_role(self, user_id, role):
+        query = """
+        UPDATE users2 SET role = $1 WHERE user_id = $2;
+        """
+        await self.pool.execute(query, role, user_id)   
+
+    async def get_products(self):
+        query = """
+        select id,name,price,description from products order by id;
+        """
+        return await self.pool.fetch(query)
+
+    async def add_product(self, name, price, description):
+        query = """
+        insert into products(name,price,description) values($1,$2,$3);
+        """
+        await self.pool.execute(query, name, int(price), description)

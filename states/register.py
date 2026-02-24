@@ -5,5 +5,5 @@ class RegisterState(StatesGroup):
     age = State()
     email = State()
     phone = State()
-    confirm = State()
+    confim = State()
     
