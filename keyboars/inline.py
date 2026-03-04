@@ -88,6 +88,21 @@ def inline_products(products):
     keyboard=[]
 
     for product in products:
-        keyboard.append([InlineKeyboardButton(text=f"{product['name']} ({product['price']} so'm)",callback_data=f'product_{product['id']}')])
+        keyboard.append([InlineKeyboardButton(
+            text=f"{product['name']} - ({product['price']} so'm)",
+            callback_data=f'adminproduct_{product['id']}')])
 
     return InlineKeyboardMarkup(inline_keyboard=keyboard)
+
+def inline_product_options(product_id):
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="✏️ Tahrirlash", callback_data=f"edit_product_{product_id}"),
+                InlineKeyboardButton(text="🗑 O'chirish", callback_data=f"delete_product_{product_id}")
+            ],
+            [
+                InlineKeyboardButton(text="🔙 Orqaga", callback_data=f"admin_start")
+            ]
+        ]
+    )

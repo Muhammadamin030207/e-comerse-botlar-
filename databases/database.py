@@ -62,3 +62,15 @@ class Database:
         insert into products(name,price,description) values($1,$2,$3);
         """
         await self.pool.execute(query, name, int(price), description)
+
+    async def delete_product(self, product_id):
+        query = """
+        delete from products where id = $1;
+        """
+        await self.pool.execute(query, product_id)
+
+    async def update_product(self, product_id, name, price, description):
+        query = """
+        update products set name = $1, price = $2, description = $3 where id = $4;
+        """
+        await self.pool.execute(query, name, int(price), description, product_id)
