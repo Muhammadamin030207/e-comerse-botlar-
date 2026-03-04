@@ -10,10 +10,6 @@ from states.update_product import UpdateProductState
 router = Router()
 
 
-
-
-
-
 @router.callback_query(F.data == "products_admin")
 async def show_products(callback: CallbackQuery, db):
     await callback.answer()
