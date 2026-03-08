@@ -4,7 +4,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 def register_inline_keyboard():
     return InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="Ro'yxatdan o'tish", callback_data="register")],
+            [InlineKeyboardButton(text="📝 Ro'yxatdan o'tish", callback_data="register")],
         ]
     )
 
@@ -88,10 +88,11 @@ def inline_products(products):
     for product in products:
         keyboard.append([InlineKeyboardButton(
             text=f"{product['name']} - ({product['price']} so'm)",
-            callback_data=f'product_{product['id']}')]),
+            callback_data=f"product_{product['id']}"
+        )])
     keyboard.append([InlineKeyboardButton(
         text="🔙 Orqaga",
-        callback_data='start_inline'
+        callback_data="start_inline"
     )])
 
     return InlineKeyboardMarkup(inline_keyboard=keyboard)
@@ -118,16 +119,18 @@ def cart_inline_keyboard(products):
                 callback_data=f'product_{product['id']}'),
             InlineKeyboardButton(
                 text="❌ O'chirish",
-                callback_data=f'remove{product['id']}')])
+                callback_data=f"remove_{product['id']}"
+            )
+        ])
 
     keyboard.append([
         InlineKeyboardButton(
             text="✅ Buyurtma berish",
-            callback_data='checkout'
+            callback_data="checkout"
         ),
         InlineKeyboardButton(
             text="🔙 Orqaga",
-            callback_data='start_inline'
+            callback_data="start_inline"
         )
     ])
     return InlineKeyboardMarkup(inline_keyboard=keyboard)
