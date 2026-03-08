@@ -18,10 +18,8 @@ def confirm_inline_keyboard():
 def start_inline_keyboard():
     return InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="👤 Profile", callback_data="profile_user")],
-            [InlineKeyboardButton(text="📦 Mahsulotlar", callback_data="products_user")],
-            [InlineKeyboardButton(text="🛒 Buyurtmalar", callback_data="orders_user")],
-            [InlineKeyboardButton(text="🔙⬅️ Orqaga", callback_data="start_user")]
+            [InlineKeyboardButton(text="👤 Profile", callback_data="profile_user"), InlineKeyboardButton(text="📦 Mahsulotlar", callback_data="products_user")],
+            [InlineKeyboardButton(text="🛒 Mening Buyurtmalarim", callback_data="orders_user"), InlineKeyboardButton(text="🗑 Savatcha", callback_data="cart_user")],
         ]
     )
 
@@ -90,7 +88,11 @@ def inline_products(products):
     for product in products:
         keyboard.append([InlineKeyboardButton(
             text=f"{product['name']} - ({product['price']} so'm)",
-            callback_data=f'adminproduct_{product['id']}')])
+            callback_data=f'product_{product['id']}')]),
+    keyboard.append([InlineKeyboardButton(
+        text="🔙 Orqaga",
+        callback_data='start_inline'
+    )])
 
     return InlineKeyboardMarkup(inline_keyboard=keyboard)
 
@@ -106,3 +108,26 @@ def inline_product_options(product_id):
             ]
         ]
     )
+def cart_inline_keyboard(products):
+    keyboard = []
+
+    for product in products:
+        keyboard.append([
+            InlineKeyboardButton(
+                text=f"{product['name']} - ({product['price']} so'm)",
+                callback_data=f'product_{product['id']}'),
+            InlineKeyboardButton(
+                text="❌ O'chirish",
+                callback_data=f'remove{product['id']}')])
+
+    keyboard.append([
+        InlineKeyboardButton(
+            text="✅ Buyurtma berish",
+            callback_data='checkout'
+        ),
+        InlineKeyboardButton(
+            text="🔙 Orqaga",
+            callback_data='start_inline'
+        )
+    ])
+    return InlineKeyboardMarkup(inline_keyboard=keyboard)

@@ -1,11 +1,12 @@
+from email import message
 from aiogram import Router,F
 from aiogram.types import Message,CallbackQuery
-from keyboars.inline import inline_products
+from databases.database import Database
 from states.add_product import AddProductRegister
 from aiogram.fsm.context import FSMContext
 from aiogram.filters import StateFilter
 from filters.filter import RoleFilter
-from keyboars.inline import inline_product_options,inline_products,admin_start_inline_keyboard
+from keyboars.inline import inline_product_options,inline_products,admin_start_inline_keyboard,cart_inline_keyboard
 from states.update_product import UpdateProductState
 router = Router()
 
@@ -120,3 +121,23 @@ async def product(msg: Message, state: FSMContext, db):
 
     await msg.answer("✅ Mahsulot muvaffaqiyatli yangilandi 🎉",reply_markup=admin_start_inline_keyboard())
     await state.clear()
+
+@router.callback_query(F.data.startswith("product_"), RoleFilter("user"))
+async def add_to_cart(call: CallbackQuery, db):
+    product_id = call.data.split("_")[1]
+    user_id = await db.get_user_id(call.from_user.id)
+    await db.add_product_to_cart(user_id, int(product_id))
+    await call.message.answer("✅ Mahsulot savatchaga qo'shildi 🗑")
+    await call.answer("✅ Mahsulot savatchaga qo'shildi! 🗑")
+
+
+@router.callback_query(F.data == "cart_user", RoleFilter("user"))
+async def view_cart(call: CallbackQuery, db):
+    user_id = await db.get_user_id(call.from_user.id)
+    products = await db.get_cart_products(user_id)
+
+    if not products:
+        await call.message.answer("Savatda hech qanday mahsulot yo'q.")
+        return
+
+    await call.message.answer("Savatdagi mahsulotlar:", reply_markup=cart_inline_keyboard(products))

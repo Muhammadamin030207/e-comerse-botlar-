@@ -38,3 +38,10 @@ async def start_register_callback(call: CallbackQuery, state: FSMContext):
     await state.set_state(RegisterState.full_name)
     await call.answer()
 
+
+@router.callback_query(F.data == "start_inline")
+async def back_to_start(call: CallbackQuery):
+    await call.message.edit_text(
+        "🏠 Asosiy menyu",
+        reply_markup=start_inline_keyboard()
+    )
