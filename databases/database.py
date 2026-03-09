@@ -61,6 +61,16 @@ class Database:
         select id,name,price,description from products order by id;
         """
         return await self.pool.fetch(query)
+    
+    async def get_product(self, product_id):
+        return await self.pool.fetchrow(
+            """
+            SELECT id, name, price, description
+            FROM products
+            WHERE id = $1
+            """,
+             product_id
+        )
 
     async def add_product(self, name, price, description):
         query = """
@@ -80,19 +90,24 @@ class Database:
         """
         await self.pool.execute(query, name, int(price), description, product_id)
 
-    async def get_or_create_cart(self,user_id):
-        order = await self.pool.fetchrow("SELECT id FROM orders WHERE user_id = $1 AND order_status = 'cart'", user_id)
+    async def get_or_create_cart(self, user_id):
+        order = await self.pool.fetchrow(
+        "SELECT id FROM orders WHERE user_id = $1 AND order_status = 'cart'",
+        user_id
+    )
 
         if order:
             return order["id"]
 
-        
-        order = await self.pool.fetchrow("""
-            INSERT INTO orders (user_id) VALUES ($1) RETURNING id
-        """, user_id)
+        order = await self.pool.fetchrow(
+            """
+            INSERT INTO orders (user_id, order_status)
+            VALUES ($1, 'cart')
+            RETURNING id
+            """, user_id
+        )
 
         return order["id"]
-    
 
     async def add_product_to_cart(self, user_id, product_id):
         order_id = await self.get_or_create_cart(user_id)
@@ -109,3 +124,10 @@ class Database:
             JOIN products p ON ci.product_id = p.id
             WHERE ci.order_id = $1
         """, order_id)
+    
+    async def remove_product_from_cart(self, user_id, product_id):
+        order_id = await self.get_or_create_cart(user_id)
+
+        await self.pool.execute("""
+            DELETE FROM order_items WHERE order_id = $1 AND product_id = $2
+        """, order_id, product_id)

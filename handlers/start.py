@@ -39,9 +39,16 @@ async def start_register_callback(call: CallbackQuery, state: FSMContext):
     await call.answer()
 
 
-@router.callback_query(F.data == "start_inline")
+@router.callback_query(F.data == "start_inline", RoleFilter("user"))
 async def back_to_start(call: CallbackQuery):
     await call.message.edit_text(
         "🏠 Asosiy menyu",
         reply_markup=start_inline_keyboard()
+    )
+
+@router.callback_query(F.data == "start_inline", RoleFilter("admin"))
+async def back_to_start(call: CallbackQuery):
+    await call.message.edit_text(
+        "🏠 Asosiy menyu",
+        reply_markup=admin_start_inline_keyboard()
     )

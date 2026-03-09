@@ -37,7 +37,7 @@ def admin_panel_inline_keyboard():
         [InlineKeyboardButton(text="➕📦 Mahsulot qo'shish", callback_data="add_product")],
         [InlineKeyboardButton(text="🛠📋 Mahsulotlar (Admin)", callback_data="manage_products")],
         [InlineKeyboardButton(text="👥📊 Userlar", callback_data="manage_users")],
-        [InlineKeyboardButton(text="🔙⬅️ Orqaga", callback_data="admin_start")]
+        [InlineKeyboardButton(text="🔙⬅️ Orqaga", callback_data="start_inline")]
     ]
     )
 
@@ -53,7 +53,7 @@ def users_inline(users):
         ])
 
     keyboard.append([
-        InlineKeyboardButton(text="🔙 Orqaga", callback_data="admin_panel")
+        InlineKeyboardButton(text="🔙 Orqaga", callback_data="start_inline")
     ])
 
     return InlineKeyboardMarkup(inline_keyboard=keyboard)
@@ -75,7 +75,7 @@ def role_inline_keyboard(user_id):
         [
             InlineKeyboardButton(
                 text="🔙⬅️ Orqaga",
-                callback_data="manage_users"
+                callback_data="start_inline"
             )
         ]
     ]
@@ -105,7 +105,7 @@ def inline_product_options(product_id):
                 InlineKeyboardButton(text="🗑 O'chirish", callback_data=f"delete_product_{product_id}")
             ],
             [
-                InlineKeyboardButton(text="🔙 Orqaga", callback_data=f"admin_start")
+                InlineKeyboardButton(text="🔙 Orqaga", callback_data=f"start_inline")
             ]
         ]
     )
@@ -116,7 +116,8 @@ def cart_inline_keyboard(products):
         keyboard.append([
             InlineKeyboardButton(
                 text=f"{product['name']} - ({product['price']} so'm)",
-                callback_data=f'product_{product['id']}'),
+                callback_data=f"product_{product['id']}"
+            ),
             InlineKeyboardButton(
                 text="❌ O'chirish",
                 callback_data=f"remove_{product['id']}"
@@ -127,10 +128,12 @@ def cart_inline_keyboard(products):
         InlineKeyboardButton(
             text="✅ Buyurtma berish",
             callback_data="checkout"
-        ),
+        )])
+    keyboard.append([
         InlineKeyboardButton(
             text="🔙 Orqaga",
             callback_data="start_inline"
         )
     ])
+
     return InlineKeyboardMarkup(inline_keyboard=keyboard)
